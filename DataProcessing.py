@@ -654,7 +654,7 @@ plt.show()
 
 
 
-
+'''
 #B1: thu thập dữ liệu
 #print(medical_df)
 
@@ -700,3 +700,28 @@ plt.plot(
     'r'
 )
 plt.show()
+'''
+
+'''
+# vẽ biểu đồ cột
+sns.barplot(
+    data = medical_df,
+    x= 'region',
+    y='charges'
+)
+plt.show()
+'''
+
+
+# mã hóa one-hot các giá trị thành dạng số để sử dụng cho các mô hình học máy
+# Nhập module preprocessing từ thư viện scikit-learn, dùng cho các thao tác tiền xử lý dữ liệu
+from sklearn import preprocessing
+# Tạo một đối tượng mã hóa one-hot (biến đổi giá trị phân loại thành các cột nhị phân 0/1)
+enc = preprocessing.OneHotEncoder()
+# Huấn luyện bộ mã hóa one-hot trên cột region của DataFrame medical_df. Kết quả là bộ mã hóa sẽ học được tất cả các giá trị duy nhất trong cột này
+enc.fit(medical_df[['region']])
+# Trả về danh sách các giá trị duy nhất (categories) mà bộ mã hóa đã học được từ cột region
+print(enc.categories_)
+
+
+
