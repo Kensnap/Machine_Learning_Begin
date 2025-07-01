@@ -712,16 +712,71 @@ sns.barplot(
 plt.show()
 '''
 
-
+'''
 # mã hóa one-hot các giá trị thành dạng số để sử dụng cho các mô hình học máy
 # Nhập module preprocessing từ thư viện scikit-learn, dùng cho các thao tác tiền xử lý dữ liệu
+'''
 from sklearn import preprocessing
+'''
 # Tạo một đối tượng mã hóa one-hot (biến đổi giá trị phân loại thành các cột nhị phân 0/1)
 enc = preprocessing.OneHotEncoder()
 # Huấn luyện bộ mã hóa one-hot trên cột region của DataFrame medical_df. Kết quả là bộ mã hóa sẽ học được tất cả các giá trị duy nhất trong cột này
 enc.fit(medical_df[['region']])
 # Trả về danh sách các giá trị duy nhất (categories) mà bộ mã hóa đã học được từ cột region
-print(enc.categories_)
+#enc.categories_
+
+# thử nghiệm
+#enc.transform([['northeast'],['southeast']]).toarray()
+
+one_hot = enc.transform(medical_df[['region']]).toarray()
+#print(one_hot)
+
+# cơ chế hoạt động
+#medical_df[['northeast', 'northwest', 'southeast', 'southwest']] = 0
+#print(medical_df)
+
+# tạo cột và gán giá trị
+medical_df[['northeast', 'northwest', 'southeast', 'southwest']] = one_hot
+print(medical_df)
+'''
 
 
+# đã thành công giảm loss từ 10000 xuống còn 6000 và lấy được dự đoán chi phí trung bình tốt hơn đáng kể rất nhiều gần sát với min
+smoker_codes = {'no':0,'yes':1}
+medical_df['smoker_code']= medical_df.smoker.map(smoker_codes)
 
+sex_codes = {'female':0,'male':1}
+medical_df['sex_code'] = medical_df.sex.map(sex_codes)
+
+enc = preprocessing.OneHotEncoder()
+enc.fit(medical_df[['region']])
+
+one_hot = enc.transform(medical_df[['region']]).toarray()
+
+medical_df[['northeast', 'northwest', 'southeast', 'southwest']] = one_hot
+
+inputs_cols = ['age','bmi','children','smoker_code','sex_code','northeast', 'northwest', 'southeast', 'southwest']
+
+inputs = medical_df[inputs_cols] 
+target = medical_df['charges']
+
+model = LinearRegression().fit(inputs,target)
+predictions = model.predict(inputs)
+
+LOSS = rmse(target,predictions)
+print("LOSS: ", LOSS)
+
+sns.scatterplot(
+    data = medical_df,
+    x= 'age',
+    y='charges'
+)
+plt.plot(
+    medical_df.age,
+    predictions,
+    'r'
+)
+plt.show()
+
+
+print(model.predict(np.array([[18, 25, 0, 0, 0, 1, 0, 0, 0]])))
